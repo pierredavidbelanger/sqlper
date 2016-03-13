@@ -133,12 +133,12 @@ public class UseCaseTest {
         Mapper<DateTime> dateTimeMapper = new ConverterMapper<DateTime, Timestamp>(Timestamp.class) {
 
             @Override
-            protected Timestamp convert(Class<DateTime> type, DateTime object) throws Exception {
+            protected Timestamp convertToNative(Class<DateTime> fromType, DateTime object, Class<Timestamp> toType) throws Exception {
                 return new Timestamp(object.getMillis());
             }
 
             @Override
-            protected DateTime convert(Timestamp object) throws Exception {
+            protected DateTime convertFromNative(Class<Timestamp> fromType, Timestamp object, Class<DateTime> toType) throws Exception {
                 return new DateTime(object);
             }
         };

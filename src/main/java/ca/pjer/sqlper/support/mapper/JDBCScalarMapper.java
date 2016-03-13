@@ -23,10 +23,6 @@ public class JDBCScalarMapper extends ScalarMapper<Object> {
 
     @Override
     protected Object get(ResultSet resultSet, int column, Class type, int sqlType) throws SQLException {
-        if (scalarType == null) {
-            return resultSet.getObject(column);
-        } else {
-            return resultSet.getObject(column, scalarType);
-        }
+        return resultSet.getObject(column);
     }
 }

@@ -1,5 +1,8 @@
 package ca.pjer.sqlper.support.mapper;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 public class DateConverterMapper extends ConverterMapper<java.util.Date, java.sql.Timestamp> {
 
     public DateConverterMapper() {
@@ -7,12 +10,12 @@ public class DateConverterMapper extends ConverterMapper<java.util.Date, java.sq
     }
 
     @Override
-    protected java.sql.Timestamp convert(Class<java.util.Date> type, java.util.Date object) throws Exception {
-        return new java.sql.Timestamp(object.getTime());
+    protected Timestamp convertToNative(Class<Date> fromType, Date object, Class<Timestamp> toType) throws Exception {
+        return new Timestamp(object.getTime());
     }
 
     @Override
-    protected java.util.Date convert(java.sql.Timestamp object) throws Exception {
+    protected Date convertFromNative(Class<Timestamp> fromType, Timestamp object, Class<Date> toType) throws Exception {
         return object;
     }
 }

@@ -30,7 +30,7 @@ public abstract class ConverterMapper<T, N> implements Mapper<T> {
         } else {
             N nativeValue;
             try {
-                nativeValue = convert(type, object);
+                nativeValue = convertToNative(type, object, nativeType);
             } catch (Exception e) {
                 throw new SqlperException("Unable to convert value '" + object + "' of type '" + type + "' to type '" + nativeType + "'", e);
             }
@@ -47,15 +47,15 @@ public abstract class ConverterMapper<T, N> implements Mapper<T> {
             return null;
         } else {
             try {
-                return convert(nativeValue);
+                return convertFromNative(nativeType, nativeValue, type);
             } catch (Exception e) {
                 throw new SqlperException("Unable to convert value '" + nativeValue + "' of type '" + nativeType + "' to type '" + type + "'", e);
             }
         }
     }
 
-    protected abstract N convert(Class<T> type, T object) throws Exception;
+    protected abstract N convertToNative(Class<T> fromType, T object, Class<N> toType) throws Exception;
 
-    protected abstract T convert(N object) throws Exception;
+    protected abstract T convertFromNative(Class<N> fromType, N object, Class<T> toType) throws Exception;
 
 }

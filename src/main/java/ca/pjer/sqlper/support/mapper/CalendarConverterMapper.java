@@ -1,5 +1,8 @@
 package ca.pjer.sqlper.support.mapper;
 
+import java.sql.Timestamp;
+import java.util.Calendar;
+
 public class CalendarConverterMapper extends ConverterMapper<java.util.Calendar, java.sql.Timestamp> {
 
     public CalendarConverterMapper() {
@@ -7,13 +10,13 @@ public class CalendarConverterMapper extends ConverterMapper<java.util.Calendar,
     }
 
     @Override
-    protected java.sql.Timestamp convert(Class<java.util.Calendar> type, java.util.Calendar object) throws Exception {
-        return new java.sql.Timestamp(object.getTimeInMillis());
+    protected Timestamp convertToNative(Class<Calendar> fromType, Calendar object, Class<Timestamp> toType) throws Exception {
+        return new Timestamp(object.getTimeInMillis());
     }
 
     @Override
-    protected java.util.Calendar convert(java.sql.Timestamp object) throws Exception {
-        java.util.Calendar c = java.util.Calendar.getInstance();
+    protected Calendar convertFromNative(Class<Timestamp> fromType, Timestamp object, Class<Calendar> toType) throws Exception {
+        Calendar c = Calendar.getInstance();
         c.setTime(object);
         return c;
     }

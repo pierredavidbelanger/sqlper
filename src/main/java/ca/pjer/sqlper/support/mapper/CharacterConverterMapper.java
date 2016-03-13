@@ -9,12 +9,12 @@ public class CharacterConverterMapper extends ConverterMapper<Character, String>
     }
 
     @Override
-    protected String convert(Class<Character> type, Character object) throws Exception {
+    protected String convertToNative(Class<Character> fromType, Character object, Class<String> toType) throws Exception {
         return String.valueOf(object);
     }
 
     @Override
-    protected Character convert(String object) throws Exception {
+    protected Character convertFromNative(Class<String> fromType, String object, Class<Character> toType) throws Exception {
         if (object.length() != 1) {
             throw new SqlperException("Found a Character with length != 1: '" + object + "'");
         }

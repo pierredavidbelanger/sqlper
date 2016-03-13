@@ -28,7 +28,7 @@ public abstract class ObjectMapper<T> implements Mapper<T> {
         }
         for (int i = index; i < metaData.getCount(); i++) {
             String name = metaData.getNames()[i];
-            Class valueType = getPropertyTypeOrThrow(metaData, object, name, i);;
+            Class valueType = getPropertyTypeOrThrow(metaData, object, name, i);
             Mapper valueMapper = mapperRegistry.find(valueType);
             Object value = valueMapper.map(mapperRegistry, resultSet, metaData, i, valueType, null);
             setPropertyValueOrThrow(metaData, object, name, i, value);

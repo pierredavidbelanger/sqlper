@@ -7,9 +7,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SqlperImpl implements Sqlper {
+
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
     private final Connection connection;
     private final MappingFactory mappingFactory;
@@ -28,6 +34,7 @@ public class SqlperImpl implements Sqlper {
     public int update(String sql) {
         ParsedSql parsedSql = mappingFactory.parseSql(sql);
         try (PreparedStatement preparedStatement = connection.prepareStatement(parsedSql.getSql())) {
+            trace(parsedSql, null);
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new SqlperException("Unable to prepare statement: " + parsedSql.getSql(), e);
@@ -42,6 +49,7 @@ public class SqlperImpl implements Sqlper {
             MappingMetaData parametersMetaData = mappingFactory.extractMetaData(parsedSql, preparedStatement);
             Mapper parametersMapper = mapperRegistry.find(parameters.getClass());
             parametersMapper.map(mapperRegistry, preparedStatement, parametersMetaData, 0, parameters.getClass(), parameters);
+            trace(parsedSql, parameters);
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new SqlperException("Unable to prepare statement: " + parsedSql.getSql(), e);
@@ -56,6 +64,7 @@ public class SqlperImpl implements Sqlper {
             MappingMetaData parametersMetaData = mappingFactory.extractMetaData(parsedSql, preparedStatement);
             Mapper parametersMapper = mapperRegistry.find(parameters.getClass());
             parametersMapper.map(mapperRegistry, preparedStatement, parametersMetaData, 0, parameters.getClass(), parameters);
+            trace(parsedSql, parameters);
             int count = preparedStatement.executeUpdate();
             try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                 if (resultSet.next()) {
@@ -74,6 +83,7 @@ public class SqlperImpl implements Sqlper {
         MapperRegistry mapperRegistry = mappingFactory.getMapperRegistry();
         ParsedSql parsedSql = mappingFactory.parseSql(sql);
         try (PreparedStatement preparedStatement = connection.prepareStatement(parsedSql.getSql())) {
+            trace(parsedSql, null);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 MappingMetaData resultsMetaData = mappingFactory.extractMetaData(parsedSql, resultSet);
                 Mapper<T> resultsMapper = mapperRegistry.find(resultsType);
@@ -97,6 +107,7 @@ public class SqlperImpl implements Sqlper {
             MappingMetaData parametersMetaData = mappingFactory.extractMetaData(parsedSql, preparedStatement);
             Mapper parametersMapper = mapperRegistry.find(parameters.getClass());
             parametersMapper.map(mapperRegistry, preparedStatement, parametersMetaData, 0, parameters.getClass(), parameters);
+            trace(parsedSql, parameters);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 MappingMetaData resultsMetaData = mappingFactory.extractMetaData(parsedSql, resultSet);
                 Mapper<T> resultsMapper = mapperRegistry.find(resultsType);
@@ -117,6 +128,7 @@ public class SqlperImpl implements Sqlper {
         MapperRegistry mapperRegistry = mappingFactory.getMapperRegistry();
         ParsedSql parsedSql = mappingFactory.parseSql(sql);
         try (PreparedStatement preparedStatement = connection.prepareStatement(parsedSql.getSql())) {
+            trace(parsedSql, null);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     MappingMetaData resultsMetaData = mappingFactory.extractMetaData(parsedSql, resultSet);
@@ -142,6 +154,7 @@ public class SqlperImpl implements Sqlper {
             MappingMetaData parametersMetaData = mappingFactory.extractMetaData(parsedSql, preparedStatement);
             Mapper parametersMapper = mapperRegistry.find(parameters.getClass());
             parametersMapper.map(mapperRegistry, preparedStatement, parametersMetaData, 0, parameters.getClass(), parameters);
+            trace(parsedSql, parameters);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     MappingMetaData resultsMetaData = mappingFactory.extractMetaData(parsedSql, resultSet);
@@ -167,6 +180,7 @@ public class SqlperImpl implements Sqlper {
             MappingMetaData parametersMetaData = mappingFactory.extractMetaData(parsedSql, preparedStatement);
             Mapper parametersMapper = mapperRegistry.find(parameters.getClass());
             parametersMapper.map(mapperRegistry, preparedStatement, parametersMetaData, 0, parameters.getClass(), parameters);
+            trace(parsedSql, parameters);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     MappingMetaData resultsMetaData = mappingFactory.extractMetaData(parsedSql, resultSet);
@@ -189,6 +203,15 @@ public class SqlperImpl implements Sqlper {
             connection.close();
         } catch (SQLException e) {
             throw new SqlperException("Unable to close connection", e);
+        }
+    }
+
+    private void trace(ParsedSql parsedSql, Object parameters) {
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.log(Level.FINEST, "{0} (names={1} parameters={2})", new Object[] {
+                    parsedSql.getSql(),
+                    parsedSql.getParameterNames() != null ? Arrays.asList(parsedSql.getParameterNames()) : Collections.emptyList(),
+                    parameters});
         }
     }
 }
