@@ -7,7 +7,7 @@
 
     <groupId>ca.pjer</groupId>
     <artifactId>sqlper</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <name>Sqlper</name>
     <description>A Java SQL helper library to map POJO to/from PreparedStatement/ResultSet</description>
